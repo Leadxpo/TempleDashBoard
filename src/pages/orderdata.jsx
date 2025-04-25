@@ -39,7 +39,7 @@ function GodownStack() {
 
   useEffect(() => {
     axios
-      .get("https://temple.signaturecutz.in/donate/api/get-all-donate-numbers")
+      .get("https://templeservice.signaturecutz.in/donate/api/get-all-donate-numbers")
       .then((res) => {
         const fetchedData = Array.isArray(res.data.data) ? res.data.data : [];
         setData(fetchedData);

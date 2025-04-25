@@ -27,7 +27,7 @@ const Login = ({ setIsAuthenticated }) => {
     const formData = { email, password };
 
     try {
-      const response = await axios.post('https://temple.signaturecutz.in/systemuser/api/login', formData);
+      const response = await axios.post('https://templeservice.signaturecutz.in/systemuser/api/login', formData);
       const { token, user } = response.data.data;
 
       localStorage.setItem('token', token);

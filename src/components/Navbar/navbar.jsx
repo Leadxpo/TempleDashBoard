@@ -81,7 +81,7 @@ const Navbar = ({ toggleSidebar, setIsAuthenticated }) => {
                 <Avatar
                   src={
                     userData?.profilePic
-                      ? `https://temple.signaturecutz.in/storage/userdp/${userData.profilePic}`
+                      ? `https://templeservice.signaturecutz.in/storage/userdp/${userData.profilePic}`
                       : undefined
                   }
                   alt={userData?.userName || "User"}

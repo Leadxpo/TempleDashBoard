@@ -119,7 +119,7 @@ const columns = [
 
   const fetchBlockedData = () => {
     axios
-      .get("https://temple.signaturecutz.in/blockednumber/api/get-all-blocked-numbers")
+      .get("https://templeservice.signaturecutz.in/blockednumber/api/get-all-blocked-numbers")
       .then((res) => {
         const blocked = res.data.data?.filter((item) => item.isBlocked) || [];
         setData(blocked);
@@ -139,7 +139,7 @@ const columns = [
     }
   
     try {
-      await axios.post("https://temple.signaturecutz.in/blockednumber/api/block-single", {
+      await axios.post("https://templeservice.signaturecutz.in/blockednumber/api/block-single", {
         blockedNumber: singleNumber.toString(),
         description: singleDescription,
         status: singleStatus,
@@ -167,7 +167,7 @@ const columns = [
     }
   
     try {
-      await axios.post("https://temple.signaturecutz.in/blockednumber/api/block-range", {
+      await axios.post("https://templeservice.signaturecutz.in/blockednumber/api/block-range", {
         from,
         to,
         description: multiDescription,
@@ -194,7 +194,7 @@ const columns = [
     }
   
     try {
-      const response = await axios.post("https://temple.signaturecutz.in/donate/api/create-donate-number", formData);
+      const response = await axios.post("https://templeservice.signaturecutz.in/donate/api/create-donate-number", formData);
       alert(`Successfully assigned donate number ${formData.donateNumber}`);
       setOpenAssignModal(false);
       setFormData({
@@ -219,7 +219,7 @@ const columns = [
     if (!confirmDelete) return;
   
     try {
-      const res = await axios.delete(`https://temple.signaturecutz.in/blockednumber/api/delete-blocked-number/${row.blockedNumber}`);
+      const res = await axios.delete(`https://templeservice.signaturecutz.in/blockednumber/api/delete-blocked-number/${row.blockedNumber}`);
       alert(res.data.message);
       fetchBlockedData(); // Refresh the list
     } catch (err) {

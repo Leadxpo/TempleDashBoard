@@ -49,7 +49,7 @@ const GodownStack = () => {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const response = await axios.get("https://temple.signaturecutz.in/payments/api/get-all-payments");
+        const response = await axios.get("https://templeservice.signaturecutz.in/payments/api/get-all-payments");
         setRows(response.data.data);
       } catch (error) {
         console.error("Failed to fetch payment data:", error);
@@ -230,7 +230,7 @@ const GodownStack = () => {
                     Payment Receipt:
                   </Typography>
                   <img
-                    src={`https://temple.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
+                    src={`https://templeservice.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
                     alt="Payment Receipt"
                     style={{
                       width: "100%",
