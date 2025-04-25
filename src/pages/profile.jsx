@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Grid,
   TextField,
@@ -17,12 +17,13 @@ import {
 import { Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../layout/PageHeader";
-import axios from "axios"; // ✅ Axios import added
+import axios from "axios";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [profilePicFile, setProfilePicFile] = useState(null);
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
-  console.log("profile user",user)
 
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -36,24 +37,15 @@ const Profile = () => {
     }
   }, []);
 
-  const inputStyles = {
-    color: "black",
-  };
-
+  const inputStyles = { color: "black" };
   const textFieldProps = {
     InputProps: { style: inputStyles },
     InputLabelProps: { style: inputStyles },
     sx: {
       "& .MuiOutlinedInput-root": {
-        "& fieldset": {
-          borderColor: "black",
-        },
-        "&:hover fieldset": {
-          borderColor: "black",
-        },
-        "&.Mui-focused fieldset": {
-          borderColor: "black",
-        },
+        "& fieldset": { borderColor: "black" },
+        "&:hover fieldset": { borderColor: "black" },
+        "&.Mui-focused fieldset": { borderColor: "black" },
       },
       input: { color: "black" },
       label: { color: "black" },
@@ -63,18 +55,36 @@ const Profile = () => {
   const handleOpenPasswordModal = () => setOpenPasswordModal(true);
   const handleClosePasswordModal = () => setOpenPasswordModal(false);
 
+  const handleFileChange = (e) => {
+    setProfilePicFile(e.target.files[0]);
+  };
+
   const handleUpdateProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.patch(
-        "https://temple.signaturecutz.in/systemuser/api/user-update",
-        user,
+      const formData = new FormData();
+
+      // Append all user fields
+      for (const key in user) {
+        if (user[key]) formData.append(key, user[key]);
+      }
+
+      // Append file if selected
+      if (profilePicFile) {
+        formData.append("profilePic", profilePicFile);
+      }
+
+      const response = await axios.put(
+        "http://localhost:3001/systemuser/api/user-update",
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
+
       alert("Profile updated successfully");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -91,7 +101,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "https://temple.signaturecutz.in/systemuser/api/reset-password",
+        "http://localhost:3001/systemuser/api/reset-password",
         {
           userId: user.userId,
           oldPassword,
@@ -124,7 +134,7 @@ const Profile = () => {
       <PageHeader title="User Details" />
       <Card
         sx={{
-          maxWidth: 1200,
+          maxWidth: 1500,
           margin: "40px auto",
           padding: 2,
           backgroundColor: "white",
@@ -143,12 +153,22 @@ const Profile = () => {
                 <Avatar
                   src={
                     user?.profilePic
-                      ? `https://temple.signaturecutz.in/storege/userdp/${user.profilePic}`
+                      ? `http://localhost:3001/storege/userdp/${user.profilePic}`
                       : ""
                   }
                   sx={{ width: 100, height: 100 }}
                 />
-                <IconButton sx={{ marginLeft: 2, color: "white" }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+                <IconButton
+                  sx={{ marginLeft: 2, color: "black" }}
+                  onClick={() => fileInputRef.current.click()}
+                >
                   <Edit />
                 </IconButton>
               </Grid>
@@ -231,12 +251,12 @@ const Profile = () => {
               </Grid>
 
               <Grid item xs={12} display="flex" justifyContent="flex-end">
-                <Button variant="outlined" sx={{ mr: 2, color: "white", borderColor: "white" }}>
+                <Button variant="outlined" sx={{ mr: 2, color: "black", borderColor: "black" }}>
                   Cancel
                 </Button>
                 <Button
                   variant="contained"
-                  sx={{ mr: 2, backgroundColor: "white", color: "#1e1e1e" }}
+                  sx={{ mr: 2, backgroundColor: "black", color: "white" }}
                   onClick={handleUpdateProfile}
                 >
                   Update User
@@ -252,13 +272,14 @@ const Profile = () => {
               </Grid>
             </Grid>
           ) : (
-            <Typography align="center" sx={{ color: "white" }}>
+            <Typography align="center" sx={{ color: "black" }}>
               Loading...
             </Typography>
           )}
         </CardContent>
       </Card>
 
+      {/* Password Modal */}
       <Dialog open={openPasswordModal} onClose={handleClosePasswordModal}>
         <DialogTitle>Change Password</DialogTitle>
         <DialogContent>

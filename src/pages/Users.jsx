@@ -197,40 +197,53 @@ function GodownStack() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.sno}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return column.id === "action" ? (
-                          <TableCell key={column.id} sx={{ textAlign: "center" }}>
-                            <IconButton onClick={(e) => handleMenuOpen(e, row)}>
-                              <MoreVertIcon />
-                            </IconButton>
-                            <Menu
-                              anchorEl={anchorEl}
-                              open={Boolean(anchorEl) && menuRow?.sno === row.sno}
-                              onClose={handleMenuClose}
-                            >
-                              <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                              <MenuItem onClick={() => handleMoreDetails(row)}>
-                                More Details
-                              </MenuItem>
-                            </Menu>
-                          </TableCell>
-                        ) : (
-                          <TableCell
-                            key={column.id}
-                            sx={{ padding: "8px 16px", textAlign: "center" }}
-                          >
-                            {value}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-              </TableBody>
+  {rows.length === 0 ? (
+    <TableRow>
+       <TableCell
+            colSpan={columns.length}
+            align="center"
+            sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
+          >
+            No data available
+          </TableCell>
+    </TableRow>
+  ) : (
+    rows
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((row) => (
+        <TableRow hover role="checkbox" tabIndex={-1} key={row.sno}>
+          {columns.map((column) => {
+            const value = row[column.id];
+            return column.id === "action" ? (
+              <TableCell key={column.id} sx={{ textAlign: "center" }}>
+                <IconButton onClick={(e) => handleMenuOpen(e, row)}>
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl) && menuRow?.sno === row.sno}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                  <MenuItem onClick={() => handleMoreDetails(row)}>
+                    More Details
+                  </MenuItem>
+                </Menu>
+              </TableCell>
+            ) : (
+              <TableCell
+                key={column.id}
+                sx={{ padding: "8px 16px", textAlign: "center" }}
+              >
+                {value}
+              </TableCell>
+            );
+          })}
+        </TableRow>
+      ))
+  )}
+</TableBody>
+
             </Table>
           </TableContainer>
 

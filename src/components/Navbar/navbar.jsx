@@ -69,7 +69,7 @@ const Navbar = ({ toggleSidebar, setIsAuthenticated }) => {
             alt="Logo"
             style={{ height: 60 }}
           />
-          <Typography variant="h6" sx={{ color: "#ffffff", fontSize: "1.2rem" }}>
+          <Typography variant="h6" sx={{ color: "#ffffff", fontSize: "1.2rem" ,fontWeight: 'bold'}}>
             Sri Shaktipeetha Koti Linga Kshethram
           </Typography>
         </Box>
