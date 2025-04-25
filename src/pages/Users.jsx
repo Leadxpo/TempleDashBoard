@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import PageHeader from "../layout/PageHeader";
 import Searchbar from "../layout/searchComponent";
-
 import {
   Box,
   IconButton,
@@ -18,22 +17,21 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
 const columns = [
   { id: "sno", label: "S.No", minWidth: 50 },
-  { id: "productName", label: "Name", minWidth: 200 },
-  { id: "saleDate", label: "Phone Number", minWidth: 100 },
-  { id: "openingStack", label: "Aadhar Number", minWidth: 100 },
-  { id: "description", label: "Donate Number", minWidth: 150 },
-  { id: "closingStack", label: "Description", minWidth: 100 },
+  { id: "userName", label: "Name", minWidth: 200 },
+  { id: "phoneNumber", label: "Phone Number", minWidth: 100 },
+  { id: "aadharNumber", label: "Aadhar Number", minWidth: 100 },
+  { id: "donateNumber", label: "Donate Number", minWidth: 150 },
+  { id: "userId", label: "User Id", minWidth: 100 },
+  { id: "gender", label: "Gender", minWidth: 100 },
   { id: "action", label: "Action", minWidth: 100 },
 ];
 
@@ -43,7 +41,6 @@ function GodownStack() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
-
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
@@ -59,11 +56,19 @@ function GodownStack() {
       const formattedRows = userData.map((user, index) => ({
         id: user.id, // 🔑 Needed for delete
         sno: index + 1,
-        productName: user.userName || "N/A",
-        saleDate: user.phoneNumber || "N/A",
-        openingStack: user.aadharNumber || "N/A",
-        description: user.donateNumber || "N/A",
-        closingStack: user.address || "N/A",
+        userName: user.userName || "N/A",
+        phoneNumber: user.phoneNumber || "N/A",
+        aadharNumber: user.aadharNumber || "N/A",
+        donateNumber: user.donateNumber || "N/A",
+        userId: user.userId || "N/A",
+        address: user.address || "N/A",
+        gender: user.gender || "N/A",
+        marriage_status: user.marriage_status || "N/A",
+        profilePic: user.profilePic || "N/A",
+        gothram: user.gothram || "N/A",
+        email: user.email || "N/A",
+        dob: user.dob || "N/A",
+
         action: "Action",
       }));
 
@@ -78,7 +83,6 @@ function GodownStack() {
   }, []);
 
   const handleChangePage = (event, newPage) => setPage(newPage);
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
@@ -115,8 +119,7 @@ function GodownStack() {
         },
       });
 
-      // Refresh list
-      fetchUsers();
+      fetchUsers(); // Refresh list
     } catch (error) {
       console.error("Failed to delete user:", error);
     } finally {
@@ -179,12 +182,13 @@ function GodownStack() {
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
-                      style={{
-                        top: 57,
-                        minWidth: column.minWidth,
+                         align="center"
+                      sx={{
                         fontWeight: "bold",
-                        padding: "2px 10px",
-                        textAlign: "center",
+                        backgroundColor: "#f0f0f0", // Light gray
+                        color: "#000",
+                        padding: "16px 8px", // Increase padding
+                        height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
                       {column.label}
@@ -210,7 +214,9 @@ function GodownStack() {
                               onClose={handleMenuClose}
                             >
                               <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                              <MenuItem onClick={() => handleMoreDetails(row)}>More Details</MenuItem>
+                              <MenuItem onClick={() => handleMoreDetails(row)}>
+                                More Details
+                              </MenuItem>
                             </Menu>
                           </TableCell>
                         ) : (

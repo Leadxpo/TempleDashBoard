@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, IconButton, Collapse } from '@mui/material';
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  IconButton,
+  Collapse,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import menuItems from './sidebarManuItems'; 
+import menuItems from './sidebarManuItems';
+import MenuIcon from "@mui/icons-material/Menu";
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -16,7 +26,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Sidebar = ({ isCollapsed }) => {
+const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const location = useLocation();
   const [openSubmenus, setOpenSubmenus] = useState({});
 
@@ -29,8 +39,8 @@ const Sidebar = ({ isCollapsed }) => {
 
   const getLinkClasses = (path) =>
     location.pathname === path
-      ? 'bg-gray-200 text-primary w-full p-2 rounded'
-      : 'hover:bg-gray-200 hover:text-gray-700 w-full p-2 rounded';
+      ? 'bg-orange-500 text-white w-full p-2 rounded'
+      : 'hover:bg-orange-400 hover:text-white w-full p-2 rounded';
 
   return (
     <Drawer
@@ -43,24 +53,37 @@ const Sidebar = ({ isCollapsed }) => {
           transition: 'width 0.3s',
           boxSizing: 'border-box',
           overflowX: 'hidden',
+          backgroundColor: '#001f4d', // Navy blue
+          color: 'white',
         },
       }}
     >
       <DrawerHeader>
-        <IconButton >
-          {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        <IconButton edge="start" onClick={toggleSidebar} sx={{ mr: 2 }}>
+          <MenuIcon sx={{ fontSize: "28px", color: "#ffffff" }} />
         </IconButton>
       </DrawerHeader>
 
-      <Divider />
+      <Divider sx={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
 
       <List>
         {menuItems.map((menu, index) => (
           <React.Fragment key={index}>
             {menu.submenu ? (
               <>
-                <ListItem button onClick={() => toggleSubmenu(menu.text)}>
-                  <ListItemIcon sx={{ minWidth: 40 }}>{menu.icon}</ListItemIcon>
+                <ListItem
+                  button
+                  onClick={() => toggleSubmenu(menu.text)}
+                  sx={{
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#002b66',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
+                    {menu.icon}
+                  </ListItemIcon>
                   {!isCollapsed && <ListItemText primary={menu.text} />}
                   {!isCollapsed &&
                     (openSubmenus[menu.text] ? <ExpandLess /> : <ExpandMore />)}
@@ -74,9 +97,17 @@ const Sidebar = ({ isCollapsed }) => {
                         to={subItem.path}
                         key={subIndex}
                         className={getLinkClasses(subItem.path)}
-                        sx={{ pl: 4 }}
+                        sx={{
+                          pl: 4,
+                          color: 'white',
+                          '&:hover': {
+                            backgroundColor: '#002b66',
+                          },
+                        }}
                       >
-                        <ListItemIcon sx={{ minWidth: 40 }}>{subItem.icon}</ListItemIcon>
+                        <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
+                          {subItem.icon}
+                        </ListItemIcon>
                         <ListItemText primary={subItem.text} />
                       </ListItem>
                     ))}
@@ -90,8 +121,16 @@ const Sidebar = ({ isCollapsed }) => {
                 to={menu.path}
                 className={getLinkClasses(menu.path)}
                 key={menu.text}
+                sx={{
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#002b66',
+                  },
+                }}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>{menu.icon}</ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
+                  {menu.icon}
+                </ListItemIcon>
                 {!isCollapsed && <ListItemText primary={menu.text} />}
               </ListItem>
             )}

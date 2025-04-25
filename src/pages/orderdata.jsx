@@ -27,7 +27,6 @@ const columns = [
   { id: "userName", label: "Name", minWidth: 100 },
   { id: "phoneNumber", label: "Phone Number", minWidth: 100 },
   { id: "dob", label: "DOB", minWidth: 100 },
-  { id: "relation", label: "Relation", minWidth: 100 },
   { id: "gothram", label: "Gothram", minWidth: 100 },
   { id: "status", label: "Status", minWidth: 100 },
 ];
@@ -36,6 +35,7 @@ function GodownStack() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     axios
@@ -80,6 +80,14 @@ function GodownStack() {
     XLSX.writeFile(workbook, "Donate_List.xlsx");
   };
 
+
+
+  const filteredRows = data.filter((row) => {
+    const donateMatch = row.donateNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    const nameMatch = row.userName?.toLowerCase().includes(searchTerm.toLowerCase());
+    return donateMatch || nameMatch;
+  });
+
   return (
     <>
       <PageHeader title="Donate Numbers" />
@@ -96,7 +104,8 @@ function GodownStack() {
               borderRadius: 2,
             }}
           >
-            <Searchbar />
+          <Searchbar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+
             <Box sx={{ display: "flex" }}>
               <IconButton title="Download PDF" onClick={handleDownloadPDF}>
                 <CloudUploadIcon />
@@ -114,11 +123,12 @@ function GodownStack() {
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
-                      style={{
-                        top: 57,
-                        minWidth: column.minWidth,
+                      sx={{
                         fontWeight: "bold",
-                        padding: "2px 10px",
+                        backgroundColor: "#f0f0f0", // Light gray
+                        color: "#000",
+                        padding: "16px 8px", // Increase padding
+                        height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
                       {column.label}
@@ -127,20 +137,33 @@ function GodownStack() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, idx) => (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
-                      {columns.map((column) => (
-                        <TableCell
-                          key={column.id}
-                          sx={{ padding: "8px 16px", textAlign: "left" }}
-                        >
-                          {row[column.id] ?? ""}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
+              {filteredRows.length === 0 ? (
+  <TableRow>
+    <TableCell
+      colSpan={columns.length}
+      align="center"
+      sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
+    >
+      No data available
+    </TableCell>
+  </TableRow>
+) : (
+  filteredRows
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    .map((row, idx) => (
+      <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
+        {columns.map((column) => (
+          <TableCell
+            key={column.id}
+            sx={{ padding: "8px 16px", textAlign: "left" }}
+          >
+            {row[column.id] ?? ""}
+          </TableCell>
+        ))}
+      </TableRow>
+    ))
+)}
+
               </TableBody>
             </Table>
           </TableContainer>

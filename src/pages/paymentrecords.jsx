@@ -13,13 +13,14 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
+  Modal,
+  Button,
+  Typography,
 } from "@mui/material";
 
 import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import CloseIcon from "@mui/icons-material/Close";
+
 
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -30,7 +31,7 @@ const columns = [
   { id: "donateNumber", label: "Donate Number", minWidth: 100 },
   { id: "userName", label: "Name", minWidth: 100 },
   { id: "phoneNumber", label: "Phone Number", minWidth: 100 },
-  { id: "Gothram", label: "Gothram", minWidth: 100 },
+  { id: "gothram", label: "Gothram", minWidth: 100 },
   { id: "userId", label: "User Id", minWidth: 100 },
   { id: "paymentRecept", label: "Payment Receipt", minWidth: 100 },
   { id: "amount", label: "Amount", minWidth: 100 },
@@ -41,9 +42,9 @@ const GodownStack = () => {
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedPdf, setSelectedPdf] = useState("");
+  const [openPreviewModal, setOpenPreviewModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -72,16 +73,23 @@ const GodownStack = () => {
     XLSX.writeFile(workbook, "Payment_Records.xlsx");
   };
 
-  const handleOpenPdf = (fileName) => {
-    const fullUrl = `https://temple.signaturecutz.in/storage/payment/${fileName}`;
-    setSelectedPdf(fullUrl);
-    setOpenModal(true);
+  const handleOpenPreviewModal = (row) => {
+    setSelectedRow(row);
+    setOpenPreviewModal(true);
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedPdf("");
+    setOpenPreviewModal(false);
+    setSelectedRow(null);
   };
+
+
+  const filteredRows = rows.filter((row) => {
+    const donateMatch = row.donateNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    const nameMatch = row.userName?.toLowerCase().includes(searchTerm.toLowerCase());
+    return donateMatch || nameMatch;
+  });
+
 
   return (
     <>
@@ -99,7 +107,8 @@ const GodownStack = () => {
               borderRadius: 2,
             }}
           >
-            <Searchbar />
+       <Searchbar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+
             <Box sx={{ display: "flex" }}>
               <IconButton title="Download Excel" onClick={handleDownloadExcel}>
                 <SimCardDownloadIcon />
@@ -114,12 +123,13 @@ const GodownStack = () => {
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
-                      style={{
-                        top: 57,
-                        minWidth: column.minWidth,
+                       align="center"
+                      sx={{
                         fontWeight: "bold",
-                        padding: "2px 10px",
-                        textAlign: "left",
+                        backgroundColor: "#f0f0f0", // Light gray
+                        color: "#000",
+                        padding: "16px 8px", // Increase padding
+                        height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
                       {column.label}
@@ -128,37 +138,50 @@ const GodownStack = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                      {columns.map((column) => (
-                        <TableCell
-                          key={column.id}
-                          sx={{
-                            padding: "8px 16px",
-                            textAlign: "left",
-                          }}
-                        >
-                          {column.id === "paymentRecept" ? (
-                            row.paymentRecept ? (
-                              <IconButton
-                                onClick={() => handleOpenPdf(row.paymentRecept)}
-                                title="View Receipt"
-                              >
-                                <PictureAsPdfIcon color="error" />
-                              </IconButton>
-                            ) : (
-                              "-"
-                            )
-                          ) : (
-                            row[column.id]
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-              </TableBody>
+  {filteredRows.length === 0 ? (
+    <TableRow>
+     <TableCell
+           colSpan={columns.length}
+           align="center"
+           sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
+         >
+           No data available
+         </TableCell>
+    </TableRow>
+  ) : (
+    filteredRows
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((row, index) => (
+        <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+          {columns.map((column) => (
+            <TableCell
+              key={column.id}
+              sx={{ padding: "8px 16px", textAlign: "center" }}
+            >
+              {column.id === "paymentRecept" ? (
+                row.paymentRecept ? (
+                  <TableCell key={column.id} sx={{ textAlign: "center" }}>
+                    <Button
+                      size="small"
+                      color="primary"
+                      onClick={() => handleOpenPreviewModal(row)}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                ) : (
+                  "-"
+                )
+              ) : (
+                row[column.id]
+              )}
+            </TableCell>
+          ))}
+        </TableRow>
+      ))
+  )}
+</TableBody>
+
             </Table>
           </TableContainer>
 
@@ -174,23 +197,77 @@ const GodownStack = () => {
         </Paper>
       </Box>
 
-      {/* PDF Preview Modal */}
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md" fullWidth>
-        <DialogTitle>Payment Receipt</DialogTitle>
-        <DialogContent>
-          {selectedPdf ? (
-            <iframe
-              src={selectedPdf}
-              width="100%"
-              height="600px"
-              title="PDF Viewer"
-              style={{ border: "none" }}
-            ></iframe>
-          ) : (
-            "No PDF selected."
+     {/* Row Preview Modal */}
+     <Modal open={openPreviewModal} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            maxHeight: "90vh",
+            overflowY: "auto",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+            <Typography variant="h6">Donation Detail</Typography>
+            <IconButton onClick={handleCloseModal}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          {selectedRow && (
+            <Box>
+              {/* Show paymentRecept image first if available */}
+              {selectedRow.paymentRecept && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    Payment Receipt:
+                  </Typography>
+                  <img
+                    src={`https://temple.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
+                    alt="Payment Receipt"
+                    style={{
+                      width: "100%",
+                      maxHeight: "300px",
+                      objectFit: "contain",
+                      marginTop: 8,
+                      borderRadius: 4,
+                    }}
+                  />
+                </Box>
+              )}
+
+              {/* Loop through other fields except unwanted ones */}
+              {Object.entries(selectedRow).map(([key, value]) => {
+                if (
+                  key === "paymentRecept" ||
+                  key === "createdAt" ||
+                  key === "updatedAt" ||
+                  key === "donateId"
+                ) {
+                  return null; // Skip these keys
+                }
+
+                return (
+                  <Box key={key} sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                      {key}:
+                    </Typography>
+                    <Typography variant="body2">{value || "N/A"}</Typography>
+                  </Box>
+                );
+              })}
+            </Box>
           )}
-        </DialogContent>
-      </Dialog>
+        </Box>
+      </Modal>
+
     </>
   );
 };

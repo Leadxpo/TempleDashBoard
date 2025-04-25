@@ -1,3 +1,4 @@
+// your existing imports remain unchanged
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PageHeader from "../layout/PageHeader";
@@ -16,12 +17,14 @@ import {
   TablePagination,
   TableRow,
   Modal,
+  Button,
+  TextField,
 } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+// Removed PDF icon usage
 import CloseIcon from "@mui/icons-material/Close";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -35,11 +38,14 @@ const DashboardPage = () => {
   });
 
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+
+  const [searchText, setSearchText] = useState("");
 
   const token = localStorage.getItem("accessToken");
 
@@ -58,8 +64,7 @@ const DashboardPage = () => {
       try {
         const endpoints = {
           totalDonate: "https://temple.signaturecutz.in/donate/api/count-pending-donates",
-          blockedDonate:
-            "https://temple.signaturecutz.in/blockednumber/api/blocked-number-count",
+          blockedDonate: "https://temple.signaturecutz.in/blockednumber/api/blocked-number-count",
           totalPayments: "https://temple.signaturecutz.in/payments/api/total-payments",
         };
 
@@ -95,6 +100,19 @@ const DashboardPage = () => {
     fetchDonateData();
   }, []);
 
+  useEffect(() => {
+    if (!searchText) {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter(
+        (item) =>
+          item.userName?.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.donateNumber?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchText, data]);
+
   const fetchDonateData = async () => {
     try {
       const res = await axios.get(
@@ -102,6 +120,7 @@ const DashboardPage = () => {
       );
       const donateData = Array.isArray(res.data?.data) ? res.data.data : [];
       setData(donateData);
+      setFilteredData(donateData);
     } catch (err) {
       console.error("Error fetching donate data:", err);
       setData([]);
@@ -112,8 +131,7 @@ const DashboardPage = () => {
     { id: "donateNumber", label: "Donate Number", minWidth: 100 },
     { id: "userName", label: "Name", minWidth: 100 },
     { id: "phoneNumber", label: "Phone Number", minWidth: 100 },
-    // { id: "dob", label: "DOB", minWidth: 100 },
-    { id: "paymentRecept", label: "Payment Recepts", minWidth: 80 },
+    { id: "paymentRecept", label: "Payment Receipts", minWidth: 80 },
     { id: "status", label: "Status", minWidth: 100 },
   ];
 
@@ -130,9 +148,6 @@ const DashboardPage = () => {
       head: [columns.map((col) => col.label)],
       body: data.map((row) => columns.map((col) => row[col.id] || "")),
       startY: 20,
-      headStyles: { fillColor: [128, 128, 128], textColor: 255 },
-      bodyStyles: { textColor: 0 },
-      styles: { fontSize: 10, cellPadding: 2 },
     });
     doc.save("Donate_List.pdf");
   };
@@ -145,14 +160,12 @@ const DashboardPage = () => {
   };
 
   const handleStatusChange1 = async (donateNumber, newStatus) => {
-    console.log("aaa", donateNumber,newStatus);
     try {
       await axios.put(
         `https://temple.signaturecutz.in/donate/api/update-donate-status/${donateNumber}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("Status updated successfully");
     } catch (error) {
       console.error("Error updating status:", error);
     }
@@ -173,17 +186,12 @@ const DashboardPage = () => {
           },
         }
       );
-      console.log("rrr", res.data);
       if (res.data.success) {
         handleStatusChange1(donateNumber, newStatus);
         alert("Payment status updated successfully");
       }
-      console.log("Payment status updated successfully");
     } catch (error) {
-      console.error(
-        "Error updating payment status:",
-        error.response?.data || error.message
-      );
+      console.error("Error updating payment status:", error);
     }
   };
 
@@ -191,6 +199,12 @@ const DashboardPage = () => {
     totalDonate: "Total Donate Numbers",
     blockedDonate: "Total Blocked Numbers",
     totalPayments: "Total Payments",
+  };
+
+  const cardColors = {
+    totalDonate: "#00e6e6",
+    blockedDonate: "#ff6666",
+    totalPayments: "#4dff4d",
   };
 
   return (
@@ -210,13 +224,11 @@ const DashboardPage = () => {
         <Grid container spacing={3}>
           {Object.entries(counts).map(([key, value]) => (
             <Grid item xs={12} sm={6} md={4} key={key}>
-              <Paper sx={{ p: 3, textAlign: "center" }}>
+              <Paper sx={{ p: 3, textAlign: "center", backgroundColor: cardColors[key] }}>
                 <Typography variant="h6" gutterBottom>
                   {labelMap[key]}
                 </Typography>
-                <Typography variant="h4">
-                  {typeof value === "object" ? JSON.stringify(value) : value}
-                </Typography>
+                <Typography variant="h4">{value}</Typography>
               </Paper>
             </Grid>
           ))}
@@ -236,7 +248,14 @@ const DashboardPage = () => {
               borderRadius: 2,
             }}
           >
-            <Searchbar />
+            <TextField
+              label="Search by Name or Donate Number"
+              variant="outlined"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              size="small"
+              sx={{ minWidth: "300px" }}
+            />
             <Box sx={{ display: "flex" }}>
               <IconButton title="Download PDF" onClick={handleDownloadPDF}>
                 <CloudUploadIcon />
@@ -254,12 +273,13 @@ const DashboardPage = () => {
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
-                      style={{
-                        top: 57,
-                        minWidth: column.minWidth,
+                         align="center"
+                      sx={{
                         fontWeight: "bold",
-                        padding: "2px 10px",
-                        textAlign: "center", // ⬅️ center align header
+                        backgroundColor: "#f0f0f0", // Light gray
+                        color: "#000",
+                        padding: "16px 8px", // Increase padding
+                        height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
                       {column.label}
@@ -268,34 +288,30 @@ const DashboardPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data
+                {filteredData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, idx) => (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
+                    <TableRow hover tabIndex={-1} key={idx}>
                       {columns.map((column) => {
                         const value = row[column.id];
 
                         if (column.id === "paymentRecept") {
                           return (
-                            <TableCell
-                              key={column.id}
-                              sx={{ textAlign: "center" }}
-                            >
-                              <IconButton
+                            <TableCell key={column.id} sx={{ textAlign: "center" }}>
+                              <Button
+                                size="small"
+                                color="primary"
                                 onClick={() => handleOpenPreviewModal(row)}
                               >
-                                <PictureAsPdfIcon sx={{ color: "red" }} />
-                              </IconButton>
+                                View
+                              </Button>
                             </TableCell>
                           );
                         }
 
                         if (column.id === "status") {
                           return (
-                            <TableCell
-                              key={column.id}
-                              sx={{ textAlign: "center" }}
-                            >
+                            <TableCell key={column.id} sx={{ textAlign: "center" }}>
                               <select
                                 value={value || "Pending"}
                                 onChange={(e) =>
@@ -326,10 +342,7 @@ const DashboardPage = () => {
                         }
 
                         return (
-                          <TableCell
-                            key={column.id}
-                            sx={{ textAlign: "center" }}
-                          >
+                          <TableCell key={column.id} sx={{ textAlign: "center" }}>
                             {value || ""}
                           </TableCell>
                         );
@@ -343,7 +356,7 @@ const DashboardPage = () => {
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={data.length}
+            count={filteredData.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -352,8 +365,9 @@ const DashboardPage = () => {
         </Paper>
       </Box>
 
-      {/* Row Preview Modal */}
-      <Modal open={openPreviewModal} onClose={handleCloseModal}>
+
+ {/* Row Preview Modal */}
+        <Modal open={openPreviewModal} onClose={handleCloseModal}>
         <Box
           sx={{
             position: "absolute",
@@ -422,6 +436,12 @@ const DashboardPage = () => {
           )}
         </Box>
       </Modal>
+
+
+
+
+
+
     </>
   );
 };

@@ -60,9 +60,10 @@ const [formData, setFormData] = useState({
   userName: '',
   phoneNumber: '',
   dob: '',
-  relation: '',
+  // relation: '',
   gothram: '',
   status: "Admin Assign",
+  description:"",
 
 });
 
@@ -92,7 +93,7 @@ const handleAssignClick = (row) => {
 // };
 
 const columns = [
-  { id: "blockedNumber", label: "Blacked Number", minWidth: 100 },
+  { id: "blockedNumber", label: "Blocked Number", minWidth: 100 },
   { id: "description", label: "Description", minWidth: 200 },
   { id: "status", label: "Status", minWidth: 100 },
   {
@@ -109,7 +110,7 @@ const columns = [
     label: "Actions",
     render: (row) => (
       <IconButton onClick={() => handleDelete(row)}>
-        <DeleteIcon sx={{ color: "blue" }} />
+        <DeleteIcon sx={{ color: "red" }} />
       </IconButton>
     ),
   },
@@ -301,35 +302,56 @@ const columns = [
             </Box>
           </Box>
 
-         {/* Table */}
-         <TableContainer sx={{ maxHeight: 600 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell key={column.id} align="center" sx={{ fontWeight: "bold" }}>
-                      {column.label}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, idx) => (
-                    <TableRow hover key={idx}>
-                      {columns.map((column) => (
-                        <TableCell key={column.id} align="center">
-                          {column.render
-                            ? column.render(row)
-                            : row[column.id] ?? ""}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <TableContainer sx={{ maxHeight: 600 }}>
+  <Table stickyHeader>
+    <TableHead>
+      <TableRow>
+        {columns.map((column) => (
+          <TableCell
+            key={column.id}
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              backgroundColor: "#f0f0f0", // Light gray
+              color: "#000",
+              padding: "16px 8px", // Increase padding
+              height: "60px", // Optional: fixed height for each header cell
+            }}
+            
+          >
+            {column.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {filteredData.length === 0 ? (
+        <TableRow>
+          <TableCell
+            colSpan={columns.length}
+            align="center"
+            sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
+          >
+            No data available
+          </TableCell>
+        </TableRow>
+      ) : (
+        filteredData
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map((row, idx) => (
+            <TableRow hover key={idx}>
+              {columns.map((column) => (
+                <TableCell key={column.id} align="center">
+                  {column.render ? column.render(row) : row[column.id] ?? ""}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
+
 
           <TablePagination
   rowsPerPageOptions={[10, 20, 30]}

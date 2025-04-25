@@ -67,9 +67,9 @@ const LoginForm = ({ handleLogin, alertMessage }) => {
         </Button>
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 1 }}>
-          <Link href="#" variant="body2" sx={{ fontSize: '0.875rem' }}>
+          {/* <Link href="#" variant="body2" sx={{ fontSize: '0.875rem' }}>
             Forgot password?
-          </Link>
+          </Link> */}
         </Box>
       </Box>
 
