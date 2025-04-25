@@ -62,6 +62,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
      <DrawerHeader sx={{ justifyContent: "space-between", px: 1 }}>
      <IconButton edge="start" onClick={toggleSidebar}>
     <MenuIcon sx={{ fontSize: "50px", color: "#ffffff" }} />
+    <p style={{marginRight:5,textAlign:'center',color: "#ffffff", fontSize: "1.2rem" ,fontWeight: 'bold'}}>Admin Dashboard</p>
   </IconButton>
   <Typography
     variant="h6"

@@ -13,10 +13,8 @@ import {
   Box,
   Chip,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import FaceIcon from "@mui/icons-material/Face";
-import Logo from '../../components/Images/Kotilinga Temple Logo 1.png';
 
 const Navbar = ({ toggleSidebar, setIsAuthenticated }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -65,7 +63,7 @@ const Navbar = ({ toggleSidebar, setIsAuthenticated }) => {
         {/* Left - Logo */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <img
-            src={Logo}
+            src={"logo192.png"}
             alt="Logo"
             style={{ height: 60 }}
           />
