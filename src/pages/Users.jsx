@@ -217,7 +217,7 @@ function GodownStack() {
     <TableRow>
        <TableCell
             colSpan={columns.length}
-            align="left"
+            align="center"
             sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
           >
             No data available

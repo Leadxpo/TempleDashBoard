@@ -55,7 +55,6 @@ function GodownStack() {
   // For multiple number modal
   const [multiDescription, setMultiDescription] = useState("");
   const [multiStatus, setMultiStatus] = useState("active");
-  const [assignTo, setAssignTo] = useState("");
   const [openAssignModal, setOpenAssignModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
@@ -83,11 +82,7 @@ function GodownStack() {
     setOpenAssignModal(true);
   };
 
-  // const handleAssignSubmit = () => {
-  //   alert(`Assigned ${selectedRow?.blockedNumber} to ${assignTo}`);
-  //   setOpenAssignModal(false);
-  //   setAssignTo("");
-  // };
+
 
   const columns = [
     { id: "blockedNumber", label: "Blocked Number", minWidth: 100 },
@@ -258,7 +253,6 @@ function GodownStack() {
   };
 
   const handleUserUpdate = async (updateFormData) => {
-    console.log("rrr :", updateFormData);
     try {
       const updateResponse = await axios.put(
         "http://localhost:3001/user/user-update-donateNumber",
@@ -300,7 +294,6 @@ function GodownStack() {
     }
   };
   const handleDeleteBlockNumber = async (row) => {
-console.log("rrr :",row)
     try {
       const res = await axios.delete(
         `http://localhost:3001/blockednumber/api/delete-blocked-number/${row.donateNumber}`

@@ -259,91 +259,104 @@ const DashboardPage = () => {
           </Box>
 
           <TableContainer sx={{ maxHeight: 840 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={column.id}
-                         align="center"
-                      sx={{
-                        fontWeight: "bold",
-                        backgroundColor: "#f0f0f0", // Light gray
-                        color: "#000",
-                        padding: "8px 16px", // Increase padding
-                        height: "60px", // Optional: fixed height for each header cell
-                      }}
-                    >
-                      {column.label}
+  <Table>
+    <TableHead>
+      <TableRow>
+        {columns.map((column) => (
+          <TableCell
+            key={column.id}
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              backgroundColor: "#f0f0f0",
+              color: "#000",
+              padding: "8px 16px",
+              height: "60px",
+            }}
+          >
+            {column.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+
+    <TableBody>
+      {filteredData.length > 0 ? (
+        filteredData
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map((row, idx) => (
+            <TableRow hover tabIndex={-1} key={idx}>
+              {columns.map((column) => {
+                const value = row[column.id];
+
+                if (column.id === "paymentRecept") {
+                  return (
+                    <TableCell key={column.id} sx={{ textAlign: "center" }}>
+                      <Button
+                        size="small"
+                        color="primary"
+                        onClick={() => handleOpenPreviewModal(row)}
+                      >
+                        View
+                      </Button>
                     </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, idx) => (
-                    <TableRow hover tabIndex={-1} key={idx}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
+                  );
+                }
 
-                        if (column.id === "paymentRecept") {
-                          return (
-                            <TableCell key={column.id} sx={{ textAlign: "center" }}>
-                              <Button
-                                size="small"
-                                color="primary"
-                                onClick={() => handleOpenPreviewModal(row)}
-                              >
-                                View
-                              </Button>
-                            </TableCell>
-                          );
+                if (column.id === "status") {
+                  return (
+                    <TableCell key={column.id} sx={{ textAlign: "center" }}>
+                      <select
+                        value={value || "Pending"}
+                        onChange={(e) =>
+                          handleStatusChange(
+                            idx,
+                            row.donateNumber,
+                            e.target.value
+                          )
                         }
+                        style={{
+                          padding: "4px 8px",
+                          fontWeight: 600,
+                          color:
+                            value === "Approved"
+                              ? "green"
+                              : value === "Declined"
+                              ? "red"
+                              : "orange",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                      </select>
+                    </TableCell>
+                  );
+                }
 
-                        if (column.id === "status") {
-                          return (
-                            <TableCell key={column.id} sx={{ textAlign: "center" }}>
-                              <select
-                                value={value || "Pending"}
-                                onChange={(e) =>
-                                  handleStatusChange(
-                                    idx,
-                                    row.donateNumber,
-                                    e.target.value
-                                  )
-                                }
-                                style={{
-                                  padding: "4px 8px",
-                                  fontWeight: 600,
-                                  color:
-                                    value === "Approved"
-                                      ? "green"
-                                      : value === "Declined"
-                                      ? "red"
-                                      : "orange",
-                                  borderRadius: "4px",
-                                }}
-                              >
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Declined">Declined</option>
-                              </select>
-                            </TableCell>
-                          );
-                        }
-
-                        return (
-                          <TableCell key={column.id} sx={{ textAlign: "center" }}>
-                            {value || ""}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                return (
+                  <TableCell key={column.id} sx={{ textAlign: "center" }}>
+                    {value || ""}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          ))
+      ) : (
+        <TableRow>
+                 <TableCell
+                      colSpan={columns.length}
+                      align="center"
+                      sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
+                    >
+                      No data available
+                    </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
 
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
