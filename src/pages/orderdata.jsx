@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -39,7 +39,7 @@ function GodownStack() {
 
   useEffect(() => {
     axios
-      .get("https://templeservice.signaturecutz.in/donate/api/get-all-donate-numbers")
+      .get("http://localhost:3001/donate/api/get-all-donate-numbers")
       .then((res) => {
         const fetchedData = Array.isArray(res.data.data) ? res.data.data : [];
         setData(fetchedData);
@@ -107,10 +107,15 @@ function GodownStack() {
           <Searchbar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 
             <Box sx={{ display: "flex" }}>
-              <IconButton title="Download PDF" onClick={handleDownloadPDF}>
-                <CloudUploadIcon />
-              </IconButton>
-              <IconButton title="Download Excel" onClick={handleDownloadExcel}>
+            <IconButton 
+  title="Download PDF" 
+  onClick={handleDownloadPDF}
+  sx={{ color: 'red' }}
+>
+  <PictureAsPdfIcon />
+</IconButton>
+
+              <IconButton title="Download Excel"  color="primary" onClick={handleDownloadExcel}>
                 <SimCardDownloadIcon />
               </IconButton>
             </Box>
@@ -124,10 +129,11 @@ function GodownStack() {
                     <TableCell
                       key={column.id}
                       sx={{
+                         textAlign: "left" ,
                         fontWeight: "bold",
                         backgroundColor: "#f0f0f0", // Light gray
                         color: "#000",
-                        padding: "16px 8px", // Increase padding
+                        padding: "8px 16px", // Increase padding
                         height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
@@ -169,7 +175,7 @@ function GodownStack() {
           </TableContainer>
 
           <TablePagination
-            rowsPerPageOptions={[10, 25, 50]}
+            rowsPerPageOptions={[10, 20, 30]}
             component="div"
             count={data.length}
             rowsPerPage={rowsPerPage}

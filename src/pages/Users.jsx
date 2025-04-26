@@ -41,11 +41,13 @@ function GodownStack() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("https://templeservice.signaturecutz.in/user/all-user", {
+      const response = await axios.get("http://localhost:3001/user/all-user", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -113,7 +115,7 @@ function GodownStack() {
       const confirmDelete = window.confirm("Are you sure you want to delete this user?");
       if (!confirmDelete) return;
 
-      await axios.delete(`https://templeservice.signaturecutz.in/user/delete-user/${menuRow.id}`, {
+      await axios.delete(`http://localhost:3001/user/delete-user/${menuRow.id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -148,6 +150,14 @@ function GodownStack() {
     XLSX.writeFile(workbook, "User_List.xlsx");
   };
 
+  const filteredRows = rows.filter((row) =>
+    row.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.aadharNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+
+
   return (
     <>
       <PageHeader title="User List" />
@@ -164,14 +174,20 @@ function GodownStack() {
               borderRadius: 2,
             }}
           >
-            <Searchbar />
+                  <Searchbar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+
             <Box sx={{ display: "flex" }}>
-              <IconButton title="Download Excel" onClick={handleDownloadExcel}>
+              <IconButton title="Download Excel"  color="primary" onClick={handleDownloadExcel}>
                 <SimCardDownloadIcon />
               </IconButton>
-              <IconButton title="Download PDF" onClick={handleDownloadPDF}>
-                <PictureAsPdfIcon />
-              </IconButton>
+              <IconButton 
+  title="Download PDF" 
+  onClick={handleDownloadPDF}
+  sx={{ color: 'red' }}
+>
+  <PictureAsPdfIcon />
+</IconButton>
+
             </Box>
           </Box>
 
@@ -182,12 +198,12 @@ function GodownStack() {
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
-                         align="center"
+                         align="left"
                       sx={{
                         fontWeight: "bold",
                         backgroundColor: "#f0f0f0", // Light gray
                         color: "#000",
-                        padding: "16px 8px", // Increase padding
+                        padding: "8px 16px", // Increase padding
                         height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
@@ -201,15 +217,16 @@ function GodownStack() {
     <TableRow>
        <TableCell
             colSpan={columns.length}
-            align="center"
+            align="left"
             sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
           >
             No data available
           </TableCell>
     </TableRow>
   ) : (
-    rows
-      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    filteredRows
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  
       .map((row) => (
         <TableRow hover role="checkbox" tabIndex={-1} key={row.sno}>
           {columns.map((column) => {
@@ -233,7 +250,7 @@ function GodownStack() {
             ) : (
               <TableCell
                 key={column.id}
-                sx={{ padding: "8px 16px", textAlign: "center" }}
+                sx={{ padding: "8px 16px", textAlign: "left" }}
               >
                 {value}
               </TableCell>

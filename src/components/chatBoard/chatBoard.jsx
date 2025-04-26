@@ -21,7 +21,7 @@ export default function ChatBot({ onClose }) {
 
   const fetchSuggestions = async (input) => {
     try {
-      const response = await axios.get("https://templeservice.signaturecutz.in/web/chat/get-Suggestions", { params: { query: input } });
+      const response = await axios.get("http://localhost:3001/web/chat/get-Suggestions", { params: { query: input } });
       setSuggestions(response.data?.suggestions || []);
     } catch (error) {
       console.error("Error fetching suggestions:", error);
@@ -35,7 +35,7 @@ export default function ChatBot({ onClose }) {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://templeservice.signaturecutz.in/web/chat/get-Answer-by-Question", { Questions: message, language });
+      const response = await axios.post("http://localhost:3001/web/chat/get-Answer-by-Question", { Questions: message, language });
       const botMessage = response.data?.data?.data?.Answers || "Sorry, I didn't get that. Can you try again?";
       setChatHistory((prevChatHistory) => [...prevChatHistory, { sender: "bot", message: botMessage }]);
     } catch (error) {

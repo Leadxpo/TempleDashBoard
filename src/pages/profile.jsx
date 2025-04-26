@@ -12,12 +12,13 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
+  DialogActions,InputAdornment
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../layout/PageHeader";
 import axios from "axios";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -29,6 +30,10 @@ const Profile = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
@@ -75,7 +80,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        "https://templeservice.signaturecutz.in/systemuser/api/user-update",
+        "http://localhost:3001/systemuser/api/user-update",
         formData,
         {
           headers: {
@@ -85,7 +90,15 @@ const Profile = () => {
         }
       );
 
-      alert("Profile updated successfully");
+
+if(response.data.success){
+  localStorage.setItem('userData', JSON.stringify(response.data.data));
+  alert("Profile updated successfully");
+window.location.reload()
+}
+else{
+  alert("Failed to update profile",response.data.message);
+}
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile");
@@ -101,7 +114,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "https://templeservice.signaturecutz.in/systemuser/api/reset-password",
+        "http://localhost:3001/systemuser/api/reset-password",
         {
           userId: user.userId,
           oldPassword,
@@ -153,7 +166,7 @@ const Profile = () => {
                 <Avatar
                   src={
                     user?.profilePic
-                      ? `https://templeservice.signaturecutz.in/storege/userdp/${user.profilePic}`
+                      ? `http://localhost:3001/storege/userdp/${user.profilePic}`
                       : ""
                   }
                   sx={{ width: 100, height: 100 }}
@@ -251,12 +264,12 @@ const Profile = () => {
               </Grid>
 
               <Grid item xs={12} display="flex" justifyContent="flex-end">
-                <Button variant="outlined" sx={{ mr: 2, color: "black", borderColor: "black" }}>
+                {/* <Button variant="outlined" sx={{ mr: 2, color: "black", borderColor: "black" }}>
                   Cancel
-                </Button>
+                </Button> */}
                 <Button
                   variant="contained"
-                  sx={{ mr: 2, backgroundColor: "black", color: "white" }}
+                  sx={{ mr: 2, backgroundColor: "primary", color: "white" }}
                   onClick={handleUpdateProfile}
                 >
                   Update User
@@ -279,42 +292,71 @@ const Profile = () => {
         </CardContent>
       </Card>
 
-      {/* Password Modal */}
       <Dialog open={openPasswordModal} onClose={handleClosePasswordModal}>
-        <DialogTitle>Change Password</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Old Password"
-            type="password"
-            fullWidth
-            margin="dense"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-          />
-          <TextField
-            label="New Password"
-            type="password"
-            fullWidth
-            margin="dense"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          <TextField
-            label="Confirm Password"
-            type="password"
-            fullWidth
-            margin="dense"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePasswordModal}>Cancel</Button>
-          <Button onClick={handleChangePassword} variant="contained" color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DialogTitle>Change Password</DialogTitle>
+      <DialogContent>
+        <TextField
+          label="Old Password"
+          type={showOldPassword ? "text" : "password"}
+          fullWidth
+          margin="dense"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowOldPassword((prev) => !prev)}>
+                  {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <TextField
+          label="New Password"
+          type={showNewPassword ? "text" : "password"}
+          fullWidth
+          margin="dense"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowNewPassword((prev) => !prev)}>
+                  {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <TextField
+          label="Confirm Password"
+          type={showConfirmPassword ? "text" : "password"}
+          fullWidth
+          margin="dense"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)}>
+                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={handleClosePasswordModal}>Cancel</Button>
+        <Button onClick={handleChangePassword} variant="contained" color="primary">
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
     </>
   );
 };

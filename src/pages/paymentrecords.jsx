@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PageHeader from "../layout/PageHeader";
 import Searchbar from "../layout/searchComponent";
+import dayjs from "dayjs";
 
 import {
   Box,
@@ -21,12 +22,12 @@ import {
 import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
 import CloseIcon from "@mui/icons-material/Close";
 
-
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import axios from "axios";
 
+// Table columns
 const columns = [
   { id: "donateNumber", label: "Donate Number", minWidth: 100 },
   { id: "userName", label: "Name", minWidth: 100 },
@@ -35,7 +36,7 @@ const columns = [
   { id: "userId", label: "User Id", minWidth: 100 },
   { id: "paymentRecept", label: "Payment Receipt", minWidth: 100 },
   { id: "amount", label: "Amount", minWidth: 100 },
-  { id: "createdAt", label: "Date", minWidth: 100 },
+  { id: "createdAt", label: "Date & Time", minWidth: 100 },
 ];
 
 const GodownStack = () => {
@@ -49,8 +50,19 @@ const GodownStack = () => {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const response = await axios.get("https://templeservice.signaturecutz.in/payments/api/get-all-payments");
-        setRows(response.data.data);
+        const response = await axios.get("http://localhost:3001/payments/api/get-all-payments");
+        const formattedData = response.data.data.map((user) => ({
+          donateNumber: user.donateNumber || "N/A",
+          userName: user.userName || "N/A",
+          phoneNumber: user.phoneNumber || "N/A",
+          gothram: user.gothram || "N/A",
+          userId: user.userId || "N/A",
+          paymentRecept: user.paymentRecept || null,
+          amount: user.amount || "N/A",
+          createdAt: dayjs(user.createdAt).format("DD-MM-YYYY hh:mm:ss A"),
+
+        }));
+        setRows(formattedData);
       } catch (error) {
         console.error("Failed to fetch payment data:", error);
       }
@@ -83,13 +95,11 @@ const GodownStack = () => {
     setSelectedRow(null);
   };
 
-
   const filteredRows = rows.filter((row) => {
     const donateMatch = row.donateNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase());
     const nameMatch = row.userName?.toLowerCase().includes(searchTerm.toLowerCase());
     return donateMatch || nameMatch;
   });
-
 
   return (
     <>
@@ -107,10 +117,9 @@ const GodownStack = () => {
               borderRadius: 2,
             }}
           >
-       <Searchbar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-
+            <Searchbar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             <Box sx={{ display: "flex" }}>
-              <IconButton title="Download Excel" onClick={handleDownloadExcel}>
+              <IconButton title="Download Excel"  color="primary" onClick={handleDownloadExcel}>
                 <SimCardDownloadIcon />
               </IconButton>
             </Box>
@@ -123,13 +132,13 @@ const GodownStack = () => {
                   {columns.map((column) => (
                     <TableCell
                       key={column.id}
-                       align="center"
+                      align="left"
                       sx={{
                         fontWeight: "bold",
-                        backgroundColor: "#f0f0f0", // Light gray
+                        backgroundColor: "#f0f0f0",
                         color: "#000",
-                        padding: "16px 8px", // Increase padding
-                        height: "60px", // Optional: fixed height for each header cell
+                        padding: "8px 16px",
+                        height: "60px",
                       }}
                     >
                       {column.label}
@@ -138,57 +147,54 @@ const GodownStack = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-  {filteredRows.length === 0 ? (
-    <TableRow>
-     <TableCell
-           colSpan={columns.length}
-           align="center"
-           sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
-         >
-           No data available
-         </TableCell>
-    </TableRow>
-  ) : (
-    filteredRows
-      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      .map((row, index) => (
-        <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-          {columns.map((column) => (
-            <TableCell
-              key={column.id}
-              sx={{ padding: "8px 16px", textAlign: "center" }}
-            >
-              {column.id === "paymentRecept" ? (
-                row.paymentRecept ? (
-                  <TableCell key={column.id} sx={{ textAlign: "center" }}>
-                    <Button
-                      size="small"
-                      color="primary"
-                      onClick={() => handleOpenPreviewModal(row)}
+                {filteredRows.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      align="center"
+                      sx={{ fontSize: "1.2rem", fontWeight: "bold", py: 4 }}
                     >
-                      View
-                    </Button>
-                  </TableCell>
+                      No data available
+                    </TableCell>
+                  </TableRow>
                 ) : (
-                  "-"
-                )
-              ) : (
-                row[column.id]
-              )}
-            </TableCell>
-          ))}
-        </TableRow>
-      ))
-  )}
-</TableBody>
-
+                  filteredRows
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => (
+                      <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                        {columns.map((column) => (
+                          <TableCell
+                            key={column.id}
+                            sx={{ padding: "8px 16px", textAlign: "left" }}
+                          >
+                            {column.id === "paymentRecept" ? (
+                              row.paymentRecept ? (
+                                <Button
+                                  size="small"
+                                  color="primary"
+                                  onClick={() => handleOpenPreviewModal(row)}
+                                >
+                                  View
+                                </Button>
+                              ) : (
+                                "-"
+                              )
+                            ) : (
+                              row[column.id]
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                )}
+              </TableBody>
             </Table>
           </TableContainer>
 
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={rows.length}
+            count={filteredRows.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -197,8 +203,8 @@ const GodownStack = () => {
         </Paper>
       </Box>
 
-     {/* Row Preview Modal */}
-     <Modal open={openPreviewModal} onClose={handleCloseModal}>
+      {/* Row Preview Modal */}
+      <Modal open={openPreviewModal} onClose={handleCloseModal}>
         <Box
           sx={{
             position: "absolute",
@@ -223,14 +229,13 @@ const GodownStack = () => {
 
           {selectedRow && (
             <Box>
-              {/* Show paymentRecept image first if available */}
               {selectedRow.paymentRecept && (
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Payment Receipt:
                   </Typography>
                   <img
-                    src={`https://templeservice.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
+                    src={`http://localhost:3001/storege/payments/${selectedRow.paymentRecept}`}
                     alt="Payment Receipt"
                     style={{
                       width: "100%",
@@ -243,7 +248,6 @@ const GodownStack = () => {
                 </Box>
               )}
 
-              {/* Loop through other fields except unwanted ones */}
               {Object.entries(selectedRow).map(([key, value]) => {
                 if (
                   key === "paymentRecept" ||
@@ -251,9 +255,8 @@ const GodownStack = () => {
                   key === "updatedAt" ||
                   key === "donateId"
                 ) {
-                  return null; // Skip these keys
+                  return null;
                 }
-
                 return (
                   <Box key={key} sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
@@ -267,7 +270,6 @@ const GodownStack = () => {
           )}
         </Box>
       </Modal>
-
     </>
   );
 };

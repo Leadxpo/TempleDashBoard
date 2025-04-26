@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 
 import Login from "./pages/login";
@@ -16,16 +17,11 @@ import Layout from "./pages/layout";
 import MoreDetails from "./pages/MoreDetails";
 import BlockedNumber from "./pages/BlockedNumbers";
 
-
-
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("token")  // ➡️ check at beginning itself
+  );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -73,6 +69,7 @@ const App = () => {
             <Route path="blockednumbers" element={<BlockedNumber />} />
             <Route path="profile" element={<Profile />} />
             <Route index element={<Navigate to="/dashboard" />} />
+            {/* 404 Page Not Found Redirection */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Route>
         ) : (

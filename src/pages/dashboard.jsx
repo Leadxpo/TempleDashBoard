@@ -1,4 +1,3 @@
-// your existing imports remain unchanged
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PageHeader from "../layout/PageHeader";
@@ -63,9 +62,9 @@ const DashboardPage = () => {
     const fetchCounts = async () => {
       try {
         const endpoints = {
-          totalDonate: "https://templeservice.signaturecutz.in/donate/api/count-pending-donates",
-          blockedDonate: "https://templeservice.signaturecutz.in/blockednumber/api/blocked-number-count",
-          totalPayments: "https://templeservice.signaturecutz.in/payments/api/total-payments",
+          totalDonate: "http://localhost:3001/donate/api/count-pending-donates",
+          blockedDonate: "http://localhost:3001/blockednumber/api/blocked-number-count",
+          totalPayments: "http://localhost:3001/payments/api/total-payments",
         };
 
         const requests = Object.entries(endpoints).map(([key, url]) =>
@@ -116,7 +115,7 @@ const DashboardPage = () => {
   const fetchDonateData = async () => {
     try {
       const res = await axios.get(
-        "https://templeservice.signaturecutz.in/payments/api/get-pending-payments"
+        "http://localhost:3001/payments/api/get-pending-payments"
       );
       const donateData = Array.isArray(res.data?.data) ? res.data.data : [];
       setData(donateData);
@@ -162,7 +161,7 @@ const DashboardPage = () => {
   const handleStatusChange1 = async (donateNumber, newStatus) => {
     try {
       await axios.put(
-        `https://templeservice.signaturecutz.in/donate/api/update-donate-status/${donateNumber}`,
+        `http://localhost:3001/donate/api/update-donate-status/${donateNumber}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -178,7 +177,7 @@ const DashboardPage = () => {
 
     try {
       const res = await axios.put(
-        `https://templeservice.signaturecutz.in/payments/api/update-payment-status/${donateNumber}`,
+        `http://localhost:3001/payments/api/update-payment-status/${donateNumber}`,
         { status: newStatus },
         {
           headers: {
@@ -248,19 +247,12 @@ const DashboardPage = () => {
               borderRadius: 2,
             }}
           >
-            <TextField
-              label="Search by Name or Donate Number"
-              variant="outlined"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              size="small"
-              sx={{ minWidth: "300px" }}
-            />
+            <Searchbar value={searchText} onChange={(e) => setSearchText(e.target.value)} />
             <Box sx={{ display: "flex" }}>
-              <IconButton title="Download PDF" onClick={handleDownloadPDF}>
+              <IconButton title="Download PDF" color="primary" onClick={handleDownloadPDF}>
                 <CloudUploadIcon />
               </IconButton>
-              <IconButton title="Download Excel" onClick={handleDownloadExcel}>
+              <IconButton title="Download Excel" color="primary"  onClick={handleDownloadExcel}>
                 <SimCardDownloadIcon />
               </IconButton>
             </Box>
@@ -278,7 +270,7 @@ const DashboardPage = () => {
                         fontWeight: "bold",
                         backgroundColor: "#f0f0f0", // Light gray
                         color: "#000",
-                        padding: "16px 8px", // Increase padding
+                        padding: "8px 16px", // Increase padding
                         height: "60px", // Optional: fixed height for each header cell
                       }}
                     >
@@ -399,7 +391,7 @@ const DashboardPage = () => {
                     Payment Receipt:
                   </Typography>
                   <img
-                    src={`https://templeservice.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
+                    src={`http://localhost:3001/storege/payments/${selectedRow.paymentRecept}`}
                     alt="Payment Receipt"
                     style={{
                       width: "100%",
