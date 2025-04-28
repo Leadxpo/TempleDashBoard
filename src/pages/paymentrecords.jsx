@@ -50,7 +50,7 @@ const GodownStack = () => {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/payments/api/get-all-payments");
+        const response = await axios.get("https://templeservice.signaturecutz.in/payments/api/get-all-payments");
         const formattedData = response.data.data.map((user) => ({
           donateNumber: user.donateNumber || "N/A",
           userName: user.userName || "N/A",
@@ -235,7 +235,7 @@ const GodownStack = () => {
                     Payment Receipt:
                   </Typography>
                   <img
-                    src={`http://localhost:3001/storege/payments/${selectedRow.paymentRecept}`}
+                    src={`https://templeservice.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
                     alt="Payment Receipt"
                     style={{
                       width: "100%",

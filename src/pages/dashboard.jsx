@@ -62,9 +62,9 @@ const DashboardPage = () => {
     const fetchCounts = async () => {
       try {
         const endpoints = {
-          totalDonate: "http://localhost:3001/donate/api/count-pending-donates",
-          blockedDonate: "http://localhost:3001/blockednumber/api/blocked-number-count",
-          totalPayments: "http://localhost:3001/payments/api/total-payments",
+          totalDonate: "https://templeservice.signaturecutz.in/donate/api/count-pending-donates",
+          blockedDonate: "https://templeservice.signaturecutz.in/blockednumber/api/blocked-number-count",
+          totalPayments: "https://templeservice.signaturecutz.in/payments/api/total-payments",
         };
 
         const requests = Object.entries(endpoints).map(([key, url]) =>
@@ -115,7 +115,7 @@ const DashboardPage = () => {
   const fetchDonateData = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:3001/payments/api/get-pending-payments"
+        "https://templeservice.signaturecutz.in/payments/api/get-pending-payments"
       );
       const donateData = Array.isArray(res.data?.data) ? res.data.data : [];
       setData(donateData);
@@ -161,7 +161,7 @@ const DashboardPage = () => {
   const handleStatusChange1 = async (donateNumber, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:3001/donate/api/update-donate-status/${donateNumber}`,
+        `https://templeservice.signaturecutz.in/donate/api/update-donate-status/${donateNumber}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -177,7 +177,7 @@ const DashboardPage = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:3001/payments/api/update-payment-status/${donateNumber}`,
+        `https://templeservice.signaturecutz.in/payments/api/update-payment-status/${donateNumber}`,
         { status: newStatus },
         {
           headers: {
@@ -404,7 +404,7 @@ const DashboardPage = () => {
                     Payment Receipt:
                   </Typography>
                   <img
-                    src={`http://localhost:3001/storege/payments/${selectedRow.paymentRecept}`}
+                    src={`https://templeservice.signaturecutz.in/storege/payments/${selectedRow.paymentRecept}`}
                     alt="Payment Receipt"
                     style={{
                       width: "100%",

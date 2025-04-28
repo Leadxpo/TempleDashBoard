@@ -79,7 +79,7 @@ const Navbar = ({ toggleSidebar, setIsAuthenticated }) => {
                 <Avatar
                   src={
                     userData?.profilePic
-                      ? `http://localhost:3001/storage/userdp/${userData.profilePic}`
+                      ? `https://templeservice.signaturecutz.in/storage/userdp/${userData.profilePic}`
                       : undefined
                   }
                   alt={userData?.userName || "User"}

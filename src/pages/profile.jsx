@@ -80,7 +80,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        "http://localhost:3001/systemuser/api/user-update",
+        "https://templeservice.signaturecutz.in/systemuser/api/user-update",
         formData,
         {
           headers: {
@@ -114,7 +114,7 @@ else{
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3001/systemuser/api/reset-password",
+        "https://templeservice.signaturecutz.in/systemuser/api/reset-password",
         {
           userId: user.userId,
           oldPassword,
@@ -166,7 +166,7 @@ else{
                 <Avatar
                   src={
                     user?.profilePic
-                      ? `http://localhost:3001/storege/userdp/${user.profilePic}`
+                      ? `https://templeservice.signaturecutz.in/storege/userdp/${user.profilePic}`
                       : ""
                   }
                   sx={{ width: 100, height: 100 }}

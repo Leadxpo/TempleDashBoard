@@ -47,7 +47,7 @@ function GodownStack() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/user/all-user", {
+      const response = await axios.get("https://templeservice.signaturecutz.in/user/all-user", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -115,7 +115,7 @@ function GodownStack() {
       const confirmDelete = window.confirm("Are you sure you want to delete this user?");
       if (!confirmDelete) return;
 
-      await axios.delete(`http://localhost:3001/user/delete-user/${menuRow.id}`, {
+      await axios.delete(`https://templeservice.signaturecutz.in/user/delete-user/${menuRow.id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

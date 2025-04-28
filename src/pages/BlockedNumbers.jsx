@@ -114,7 +114,7 @@ function GodownStack() {
 
   const fetchBlockedData = () => {
     axios
-      .get("http://localhost:3001/blockednumber/api/get-all-blocked-numbers")
+      .get("https://templeservice.signaturecutz.in/blockednumber/api/get-all-blocked-numbers")
       .then((res) => {
         const blocked = res.data.data?.filter((item) => item.isBlocked) || [];
         setData(blocked);
@@ -134,7 +134,7 @@ function GodownStack() {
     }
 
     try {
-      await axios.post("http://localhost:3001/blockednumber/api/block-single", {
+      await axios.post("https://templeservice.signaturecutz.in/blockednumber/api/block-single", {
         blockedNumber: singleNumber.toString(),
         description: singleDescription,
         status: singleStatus,
@@ -159,7 +159,7 @@ function GodownStack() {
     }
 
     try {
-      await axios.post("http://localhost:3001/blockednumber/api/block-range", {
+      await axios.post("https://templeservice.signaturecutz.in/blockednumber/api/block-range", {
         from,
         to,
         description: multiDescription,
@@ -186,7 +186,7 @@ function GodownStack() {
     if (userId.length >= 3) {
       try {
         const response = await axios.post(
-          `http://localhost:3001/user/get-by-userId`,
+          `https://templeservice.signaturecutz.in/user/get-by-userId`,
           { userId }
         );
         const user = response.data.data;
@@ -228,7 +228,7 @@ function GodownStack() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/donate/api/create-donate-number",
+        "https://templeservice.signaturecutz.in/donate/api/create-donate-number",
         formData
       );
 
@@ -255,7 +255,7 @@ function GodownStack() {
   const handleUserUpdate = async (updateFormData) => {
     try {
       const updateResponse = await axios.put(
-        "http://localhost:3001/user/user-update-donateNumber",
+        "https://templeservice.signaturecutz.in/user/user-update-donateNumber",
         {
           userId: updateFormData.userId,
           donateNumber: updateFormData.donateNumber,
@@ -284,7 +284,7 @@ function GodownStack() {
 
     try {
       const res = await axios.delete(
-        `http://localhost:3001/blockednumber/api/delete-blocked-number/${row.blockedNumber}`
+        `https://templeservice.signaturecutz.in/blockednumber/api/delete-blocked-number/${row.blockedNumber}`
       );
       alert(res.data.message);
       fetchBlockedData(); // Refresh the list
@@ -296,7 +296,7 @@ function GodownStack() {
   const handleDeleteBlockNumber = async (row) => {
     try {
       const res = await axios.delete(
-        `http://localhost:3001/blockednumber/api/delete-blocked-number/${row.donateNumber}`
+        `https://templeservice.signaturecutz.in/blockednumber/api/delete-blocked-number/${row.donateNumber}`
       );
       alert(res.data.message);
       fetchBlockedData(); // Refresh the list
